@@ -170,23 +170,15 @@ class _PizzaHomeContainerState extends State<PizzaHomeContainer> {
               height: 60,
               width: 60,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color.fromARGB(255, 248, 155, 63),
-                    Color.fromARGB(255, 221, 88, 35),
-                  ],
-                ),
-              ),
-              child: Image(
-                image: AssetImage(
-                  'assets/images/cart.png',
-                ),
+                  borderRadius: BorderRadius.circular(10),
+                  gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.orange.withOpacity(0.5), Colors.orange])),
+              child: Icon(
+                Icons.shopping_cart_outlined,
                 color: Colors.white,
-                height: 10,
-                width: 10,
+                size: 35,
               ),
             )),
       ]),

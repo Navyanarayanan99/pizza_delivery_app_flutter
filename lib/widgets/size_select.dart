@@ -15,8 +15,8 @@ class _ShadowTextSelectorState extends State<ShadowTextSelector> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-       bottom: 140,
-            left: 110,
+      bottom: 140,
+      left: 110,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -45,8 +45,8 @@ class _ShadowTextSelectorState extends State<ShadowTextSelector> {
         });
       },
       child: Container(
-        height: 35 * scaleFactor,
-        width: 35 * scaleFactor,
+        height: 35,
+        width: 35,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: isSelected ? Colors.white : null,
@@ -76,12 +76,13 @@ class _ShadowTextSelectorState extends State<ShadowTextSelector> {
   }
 }
 
-
 void main() {
   runApp(
     MaterialApp(
       home: Scaffold(
-        body: ShadowTextSelector(onSizeSelected: (String ) {  },),
+        body: ShadowTextSelector(
+          onSizeSelected: (String) {},
+        ),
       ),
     ),
   );
