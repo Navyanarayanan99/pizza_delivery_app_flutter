@@ -1,7 +1,8 @@
 import 'package:flutter/rendering.dart';
 
 class Ingredient {
-  const Ingredient(this.image, this.positions);
+  const Ingredient(this.name, this.image, this.positions);
+  final String name;
   final String image;
   final List<Offset> positions;
 
@@ -10,6 +11,7 @@ class Ingredient {
 
 final ingredients = const <Ingredient>[
   Ingredient(
+    'Green Chillies',
     'assets/images/toppings/green_chillies_thumb.png',
     <Offset>[
       Offset(0.2, 0.2),
@@ -20,6 +22,7 @@ final ingredients = const <Ingredient>[
     ],
   ),
   Ingredient(
+    'Green Peppers',
     'assets/images/toppings/green_peppers_thumb.png',
     <Offset>[
       Offset(0.2, 0.35),
@@ -30,6 +33,7 @@ final ingredients = const <Ingredient>[
     ],
   ),
   Ingredient(
+    'Olives',
     'assets/images/toppings/olives_thumb.png',
     <Offset>[
       Offset(0.2, 0.35),
@@ -40,6 +44,7 @@ final ingredients = const <Ingredient>[
     ],
   ),
   Ingredient(
+    'Onions',
     'assets/images/toppings/onions_thumb.png',
     <Offset>[
       Offset(0.2, 0.15),
@@ -50,6 +55,7 @@ final ingredients = const <Ingredient>[
     ],
   ),
   Ingredient(
+    'Mozzarella Cheese',
     'assets/images/toppings/mozarella_Cheese_thumb.png',
     <Offset>[
       Offset(0.2, 0.35),
@@ -60,6 +66,7 @@ final ingredients = const <Ingredient>[
     ],
   ),
   Ingredient(
+    'Mushrooms',
     'assets/images/toppings/mushrooms_thumb.png',
     <Offset>[
       Offset(0.2, 0.35),
@@ -70,6 +77,7 @@ final ingredients = const <Ingredient>[
     ],
   ),
   Ingredient(
+    'Pineapples',
     'assets/images/toppings/pineapples_thumb.png',
     <Offset>[
       Offset(0.2, 0.2),

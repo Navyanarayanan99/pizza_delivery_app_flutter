@@ -1,8 +1,10 @@
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:pizza_app/widgets/pizza_order_screen.dart';
 import 'package:pizza_app/widgets/size_select.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:pizza_app/widgets/pizza_order_screen.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class PizzaHomeContainer extends StatefulWidget {
   const PizzaHomeContainer({Key? key});
@@ -12,6 +14,45 @@ class PizzaHomeContainer extends StatefulWidget {
 }
 
 class _PizzaHomeContainerState extends State<PizzaHomeContainer> {
+  final stt.SpeechToText speech = stt.SpeechToText();
+
+  final FlutterTts flutterTts = FlutterTts();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeSpeechRecognition();
+  }
+
+  void _initializeSpeechRecognition() async {
+    bool available = await speech.initialize();
+    if (available) {
+      speech.listen(
+        onResult: (result) {
+          String command = result.recognizedWords.toLowerCase();
+          if (command.contains('order pizza')) {
+            _navigateToPizzaOrderScreen();
+            _speakResponse('Ordering the pizza...');
+          }
+        },
+        cancelOnError: true,
+      );
+    } else {
+      print('Speech recognition not available');
+    }
+  }
+
+  void _navigateToPizzaOrderScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PizzaOrderScreen()),
+    );
+  }
+
+  Future<void> _speakResponse(String response) async {
+    await flutterTts.speak(response);
+  }
+
   String selectedSize = '';
   double plateSizeFactor = 1.0;
 
@@ -181,6 +222,16 @@ class _PizzaHomeContainerState extends State<PizzaHomeContainer> {
                 size: 35,
               ),
             )),
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton(
+            onPressed: () {
+              _initializeSpeechRecognition();
+            },
+            child: Icon(Icons.mic),
+          ),
+        ),
       ]),
     );
   }

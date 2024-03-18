@@ -1,14 +1,8 @@
-// ignore_for_file: unused_element
-
-import 'package:flutter/animation.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:pizza_app/widgets/order-header.dart';
 import 'package:pizza_app/data/ingredient.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-
 
 class PizzaOrderScreen extends StatefulWidget {
   const PizzaOrderScreen({Key? key}) : super(key: key);
@@ -19,6 +13,10 @@ class PizzaOrderScreen extends StatefulWidget {
 
 class _PizzaOrderScreenState extends State<PizzaOrderScreen> {
   static const _pizzaCardSize = 48.0;
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  final _listIngredients = <Ingredient>[];
+  final FlutterTts flutterTts = FlutterTts();
+  List<Animation> _animationList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +53,7 @@ class _PizzaOrderScreenState extends State<PizzaOrderScreen> {
           width: _pizzaCardSize,
           left: MediaQuery.of(context).size.width / 2 - _pizzaCardSize / 2,
           child: _PizzaCartbutton(),
-        )
+        ),
       ],
     ));
   }
@@ -70,13 +68,14 @@ class _PizzaDetails extends StatefulWidget {
 
 class __PizzaDetailsState extends State<_PizzaDetails>
     with SingleTickerProviderStateMixin {
-       late stt.SpeechToText _speech;
   final _listIngredients = <Ingredient>[];
   late AnimationController _animationController;
   int _total = 15;
   final _notifierFocused = ValueNotifier(false);
   List<Animation> _animationList = <Animation>[];
   late BoxConstraints _pizzaConstraints;
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  final FlutterTts flutterTts = FlutterTts();
 
   Widget _buildIngredientsWidget() {
     List<Widget> elements = [];
@@ -188,6 +187,7 @@ class __PizzaDetailsState extends State<_PizzaDetails>
   void initState() {
     _animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 700));
+    _initializeSpeechRecognition();
     super.initState();
   }
 
@@ -197,13 +197,66 @@ class __PizzaDetailsState extends State<_PizzaDetails>
     super.dispose();
   }
 
+  void _initializeSpeechRecognition() async {
+    bool available = await _speech.initialize();
+    if (!available) {
+      print('Speech recognition not available');
+    }
+  }
 
+  void _startListening() {
+    if (_speech.isListening) return;
+    _speech.listen(onResult: (result) {
+      String command = result.recognizedWords.toLowerCase();
+      if (command.contains('chilli')) {
+        _addIngredient(ingredients[0]);
+        _speakResponse('Adding chilli...');
+      } else if (command.contains('green peppers')) {
+        _addIngredient(ingredients[1]);
+        _speakResponse('greenpepper...');
+      } else if (command.contains('olives')) {
+        _addIngredient(ingredients[2]);
+        _speakResponse('Adding olives...');
+      } else if (command.contains('onion')) {
+        _addIngredient(ingredients[3]);
+        _speakResponse('Adding onion...');
+      } else if (command.contains('cheese')) {
+        _addIngredient(ingredients[4]);
+        _speakResponse('Adding cheese...');
+      } else if (command.contains('mushrooms')) {
+        _addIngredient(ingredients[5]);
+        _speakResponse('Adding mushroom...');
+      } else if (command.contains('pineapple')) {
+        _addIngredient(ingredients[6]);
+        _speakResponse('Adding pineapple...');
+      } else {
+        print('Unrecognized command: $command');
+      }
+    });
+  }
 
+  void _addIngredient(Ingredient ingredient) {
+    _listIngredients.add(ingredient);
+    _buildIngredientsAnimation();
+    _animationController.forward(from: 0.0);
+  }
+
+  Future<void> _speakResponse(String response) async {
+    await flutterTts.speak(response);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton(
+            onPressed: _startListening,
+            child: Icon(Icons.mic),
+          ),
+        ),
         Column(
           children: [
             Expanded(
@@ -211,7 +264,7 @@ class __PizzaDetailsState extends State<_PizzaDetails>
                 onAccept: (ingredient) {
                   print('onAcccept');
                   _notifierFocused.value = false;
-                  
+
                   setState(() {
                     _listIngredients.add(ingredient as Ingredient);
                     _total++;
@@ -281,16 +334,6 @@ class __PizzaDetailsState extends State<_PizzaDetails>
             ),
             AnimatedSwitcher(
               duration: Duration(microseconds: 300),
-              // layoutBuilder: (Widget currentChild, List<Widget> previousChildren) {
-              //   return Stack(
-              //     fit: StackFit.expand,
-              //     children: <Widget>[
-              //       ...previousChildren,
-              //       if(currentChild != null) currentChild,
-              //     ],
-              //     alignment: Alignment.center,
-              //   );
-              // },
               transitionBuilder: (child, animation) {
                 return FadeTransition(
                   opacity: animation,
