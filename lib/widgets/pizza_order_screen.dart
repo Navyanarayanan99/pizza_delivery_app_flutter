@@ -1,7 +1,15 @@
+import 'package:animated_digit/animated_digit.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:pizza_app/consts.dart';
+import 'package:pizza_app/models/pizza_model.dart';
+import 'package:pizza_app/widgets/bassil_leaf.dart';
+import 'package:pizza_app/widgets/custom_clip.dart';
 import 'package:pizza_app/widgets/order-header.dart';
 import 'package:pizza_app/data/ingredient.dart';
+import 'package:pizza_app/widgets/pizza_plate.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class PizzaOrderScreen extends StatefulWidget {
@@ -17,6 +25,7 @@ class _PizzaOrderScreenState extends State<PizzaOrderScreen> {
   final _listIngredients = <Ingredient>[];
   final FlutterTts flutterTts = FlutterTts();
   List<Animation> _animationList = [];
+  int currentPizza = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -24,18 +33,42 @@ class _PizzaOrderScreenState extends State<PizzaOrderScreen> {
         body: Stack(
       children: [
         Positioned.fill(
-          bottom: 50,
+          //bottom: 50,
           child: Card(
             elevation: 10,
-            color: Colors.white,
+            color: const Color.fromARGB(255, 82, 80, 80),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             child: Column(
               children: [
+                // SizedBox(
+                //   height: 60,
+                // ),
                 OrderHeader(),
+
+                Text(
+                  dataPizza[currentPizza].name,
+                  style: font.copyWith(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+                Text(
+                  dataPizza[currentPizza].desc,
+                  overflow: TextOverflow.clip,
+                  style: font.copyWith(
+                      fontSize: 14, color: Color.fromARGB(255, 228, 223, 223)),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+
                 Expanded(
                   flex: 5,
-                  child: _PizzaDetails(),
+                  child: _PizzaDetails(
+                    selectedPizza:
+                        dataPizza[currentPizza], // Pass selected pizza data
+                  ),
                 ),
                 Expanded(
                   flex: 2,
@@ -48,19 +81,33 @@ class _PizzaOrderScreenState extends State<PizzaOrderScreen> {
           ),
         ),
         Positioned(
-          bottom: 25,
-          height: _pizzaCardSize,
-          width: _pizzaCardSize,
-          left: MediaQuery.of(context).size.width / 2 - _pizzaCardSize / 2,
-          child: _PizzaCartbutton(),
+          bottom: 20,
+          left: 20,
+          child: ClipPath(
+            clipper: CustomClip(),
+            child: Container(
+              height: 35,
+              width: 350,
+              color: black.withOpacity(0.35),
+            ),
+          ),
         ),
+        // Positioned(
+        //   bottom: 25,
+        //   height: _pizzaCardSize,
+        //   width: _pizzaCardSize,
+        //   left: MediaQuery.of(context).size.width / 2 - _pizzaCardSize / 2,
+        //   child: _PizzaCartbutton(),
+        // ),
       ],
     ));
   }
 }
 
 class _PizzaDetails extends StatefulWidget {
-  const _PizzaDetails({super.key});
+  final PizzaModel selectedPizza;
+  const _PizzaDetails({Key? key, required this.selectedPizza})
+      : super(key: key);
 
   @override
   State<_PizzaDetails> createState() => __PizzaDetailsState();
@@ -76,6 +123,8 @@ class __PizzaDetailsState extends State<_PizzaDetails>
   late BoxConstraints _pizzaConstraints;
   final stt.SpeechToText _speech = stt.SpeechToText();
   final FlutterTts flutterTts = FlutterTts();
+  int currentPizza = 0;
+  int selectedSize = 0;
 
   Widget _buildIngredientsWidget() {
     List<Widget> elements = [];
@@ -208,27 +257,33 @@ class __PizzaDetailsState extends State<_PizzaDetails>
     if (_speech.isListening) return;
     _speech.listen(onResult: (result) {
       String command = result.recognizedWords.toLowerCase();
-      if (command.contains('chilli')) {
+      if (command.contains('corn')) {
         _addIngredient(ingredients[0]);
-        _speakResponse('Adding chilli...');
-      } else if (command.contains('green peppers')) {
+        _speakResponse('Adding corn...');
+      } else if (command.contains('tomato')) {
         _addIngredient(ingredients[1]);
-        _speakResponse('greenpepper...');
+        _speakResponse('adding tomato...');
       } else if (command.contains('olives')) {
         _addIngredient(ingredients[2]);
         _speakResponse('Adding olives...');
-      } else if (command.contains('onion')) {
+         } else if (command.contains('onion')) {
         _addIngredient(ingredients[3]);
         _speakResponse('Adding onion...');
-      } else if (command.contains('cheese')) {
+      } else if (command.contains('mushroom')) {
         _addIngredient(ingredients[4]);
-        _speakResponse('Adding cheese...');
-      } else if (command.contains('mushrooms')) {
-        _addIngredient(ingredients[5]);
         _speakResponse('Adding mushroom...');
+      } else if (command.contains('cheese')) {
+        _addIngredient(ingredients[5]);
+        _speakResponse('Adding Cheese...');
       } else if (command.contains('pineapple')) {
         _addIngredient(ingredients[6]);
         _speakResponse('Adding pineapple...');
+         } else if (command.contains('sausage')) {
+        _addIngredient(ingredients[7]);
+        _speakResponse('Adding sausage...');
+         } else if (command.contains('bassil')) {
+        _addIngredient(ingredients[8]);
+        _speakResponse('Adding bassil...');
       } else {
         print('Unrecognized command: $command');
       }
@@ -309,15 +364,21 @@ class __PizzaDetailsState extends State<_PizzaDetails>
                                       : constraints.maxHeight - 10,
                                   child: Stack(
                                     children: [
-                                      Image.asset(
-                                        'assets/images/wooden_plate2.png',
-                                        fit: BoxFit.cover,
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          const BassilLeaf(),
+                                          const PizzaPlate(),
+                                        ],
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.all(10.0),
+                                        padding:
+                                            EdgeInsets.only(left: 55, top: 35),
                                         child: Image.asset(
-                                          'assets/images/pizza1.png',
-                                          fit: BoxFit.contain,
+                                          'assets/images/${widget.selectedPizza.image}', // Use selected pizza image
+                                          fit: BoxFit.cover,
+                                          width: 310,
+                                          height: 310,
                                         ),
                                       ),
                                     ],
@@ -346,15 +407,14 @@ class __PizzaDetailsState extends State<_PizzaDetails>
                   ),
                 );
               },
-              child: Text(
-                '₹ $_total',
-                key: UniqueKey(),
-                style: TextStyle(
-                  fontSize: 40,
-                  fontFamily: 'RozhaOne',
-                  fontWeight: FontWeight.w500,
-                  color: Color.fromARGB(221, 47, 18, 0),
-                ),
+              child: AnimatedDigitWidget(
+                value: dataPizza[currentPizza].price[selectedSize],
+                //  prefix: '₹',
+                textStyle: font.copyWith(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+                fractionDigits: 2,
               ),
             )
           ],
@@ -369,45 +429,32 @@ class __PizzaDetailsState extends State<_PizzaDetails>
   }
 }
 
-class _PizzaCartbutton extends StatefulWidget {
-  late final VoidCallback onTap;
+// class _PizzaCartbutton extends StatefulWidget {
+//   late final VoidCallback onTap;
 
-  @override
-  State<_PizzaCartbutton> createState() => _PizzaCartbuttonState();
-}
+//   @override
+//   State<_PizzaCartbutton> createState() => _PizzaCartbuttonState();
+// }
 
-class _PizzaCartbuttonState extends State<_PizzaCartbutton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-
-  @override
-  void initState() {
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(microseconds: 400));
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.orange.withOpacity(0.5), Colors.orange])),
-      child: Icon(
-        Icons.shopping_cart_outlined,
-        color: Colors.white,
-      ),
-    );
-  }
-}
+// class _PizzaCartbuttonState extends State<_PizzaCartbutton>
+//     with SingleTickerProviderStateMixin {
+//   late AnimationController _animationController;
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       // decoration: BoxDecoration(
+//       //     borderRadius: BorderRadius.circular(5),
+//       //     gradient: LinearGradient(
+//       //         begin: Alignment.topCenter,
+//       //         end: Alignment.bottomCenter,
+//       //         colors: [Colors.orange.withOpacity(0.5), Colors.orange])),
+//       child: Icon(
+//         Icons.shopping_cart_outlined,
+//         color: Colors.white,
+//       ),
+//     );
+//   }
+// }
 
 class _pizzaIngredients extends StatelessWidget {
   @override
@@ -435,11 +482,8 @@ class _pizzaIngredientItem extends StatelessWidget {
     final child = Padding(
         padding: EdgeInsets.symmetric(horizontal: 7.0),
         child: Container(
-          height: 50,
-          width: 50,
-          decoration: BoxDecoration(
-              color: Color.fromARGB(255, 236, 225, 182),
-              shape: BoxShape.circle),
+          height: 70,
+          width: 70,
           child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Image.asset(

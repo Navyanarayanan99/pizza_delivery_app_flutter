@@ -7,24 +7,26 @@ class OrderHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 44),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 54),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
               onTap: () {
                 Navigator.pop(context);
               },
-              child: Image(image: AssetImage('assets/images/back_arrow.png'))),
-          Text('New Orleans \n Pizza 2',
-              style: TextStyle(
-                  fontSize: 35,
-                  fontFamily: 'IntroHeadB',
-                  fontWeight: FontWeight.w500,
-                  color: Color.fromARGB(221, 47, 18, 0))),
-          SizedBox(
-            width: 70,
-          ),
-          Image(image: AssetImage('assets/images/cart.png'))
+              child: Image(
+                image: AssetImage('assets/images/back_arrow.png'),
+                color: Colors.white,
+                width: 30,
+                height: 30,
+              )),
+          Image(
+            image: AssetImage('assets/images/cart.png'),
+            color: Colors.white,
+            width: 40,
+            height: 40,
+          )
         ],
       ),
     );

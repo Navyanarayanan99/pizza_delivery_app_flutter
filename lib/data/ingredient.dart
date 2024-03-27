@@ -11,8 +11,8 @@ class Ingredient {
 
 final ingredients = const <Ingredient>[
   Ingredient(
-    'Green Chillies',
-    'assets/images/toppings/green_chillies_thumb.png',
+    'Corn',
+    'assets/corn/corn (1).png',
     <Offset>[
       Offset(0.2, 0.2),
       Offset(0.6, 0.2),
@@ -22,8 +22,8 @@ final ingredients = const <Ingredient>[
     ],
   ),
   Ingredient(
-    'Green Peppers',
-    'assets/images/toppings/green_peppers_thumb.png',
+    'Tomato',
+    'assets/tomato/tomato (1).png',
     <Offset>[
       Offset(0.2, 0.35),
       Offset(0.65, 0.35),
@@ -43,20 +43,9 @@ final ingredients = const <Ingredient>[
       Offset(0.3, 0.5)
     ],
   ),
-  Ingredient(
-    'Onions',
-    'assets/images/toppings/onions_thumb.png',
-    <Offset>[
-      Offset(0.2, 0.15),
-      Offset(0.65, 0.3),
-      Offset(0.25, 0.25),
-      Offset(0.45, 0.25),
-      Offset(0.4, 0.35)
-    ],
-  ),
-  Ingredient(
-    'Mozzarella Cheese',
-    'assets/images/toppings/mozarella_Cheese_thumb.png',
+   Ingredient(
+    'Onion',
+    'assets/onion/onion (1).png',
     <Offset>[
       Offset(0.2, 0.35),
       Offset(0.65, 0.35),
@@ -65,7 +54,7 @@ final ingredients = const <Ingredient>[
       Offset(0.3, 0.5)
     ],
   ),
-  Ingredient(
+   Ingredient(
     'Mushrooms',
     'assets/images/toppings/mushrooms_thumb.png',
     <Offset>[
@@ -77,6 +66,19 @@ final ingredients = const <Ingredient>[
     ],
   ),
   Ingredient(
+    'Cheese',
+    'assets/images/toppings/mozarella_Cheese_thumb.png',
+    <Offset>[
+      Offset(0.2, 0.15),
+      Offset(0.65, 0.3),
+      Offset(0.25, 0.25),
+      Offset(0.45, 0.25),
+      Offset(0.4, 0.35)
+    ],
+  ),
+ 
+ 
+  Ingredient(
     'Pineapples',
     'assets/images/toppings/pineapples_thumb.png',
     <Offset>[
@@ -85,6 +87,28 @@ final ingredients = const <Ingredient>[
       Offset(0.4, 0.25),
       Offset(0.5, 0.3),
       Offset(0.4, 0.60)
+    ],
+  ),
+  Ingredient(
+    'Onions',
+    'assets/sausage/sausage (1).png',
+    <Offset>[
+      Offset(0.2, 0.15),
+      Offset(0.65, 0.3),
+      Offset(0.25, 0.25),
+      Offset(0.45, 0.25),
+      Offset(0.4, 0.35)
+    ],
+  ),
+  Ingredient(
+    'Onions',
+    'assets/bassil/bassil (4).png',
+    <Offset>[
+      Offset(0.2, 0.15),
+      Offset(0.65, 0.3),
+      Offset(0.25, 0.25),
+      Offset(0.45, 0.25),
+      Offset(0.4, 0.35)
     ],
   ),
 ];

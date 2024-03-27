@@ -1,10 +1,10 @@
-// ignore_for_file: avoid_print
-
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:pizza_app/widgets/size_select.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:pizza_app/models/pizza_model.dart';
+import 'package:pizza_app/pizza_page.dart';
 import 'package:pizza_app/widgets/pizza_order_screen.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class PizzaHomeContainer extends StatefulWidget {
   const PizzaHomeContainer({Key? key});
@@ -15,14 +15,10 @@ class PizzaHomeContainer extends StatefulWidget {
 
 class _PizzaHomeContainerState extends State<PizzaHomeContainer> {
   final stt.SpeechToText speech = stt.SpeechToText();
-
   final FlutterTts flutterTts = FlutterTts();
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeSpeechRecognition();
-  }
+  bool isSmallSelected = false;
+  bool isMediumSelected = false;
+  int selectedPizzaIndex = 0;
 
   void _initializeSpeechRecognition() async {
     bool available = await speech.initialize();
@@ -43,9 +39,14 @@ class _PizzaHomeContainerState extends State<PizzaHomeContainer> {
   }
 
   void _navigateToPizzaOrderScreen() {
-    Navigator.push(
+     var selectedPizza;
+     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PizzaOrderScreen()),
+      MaterialPageRoute(
+        builder: (context) => PizzaOrderScreen(
+         
+        ),
+      ),
     );
   }
 
@@ -53,186 +54,246 @@ class _PizzaHomeContainerState extends State<PizzaHomeContainer> {
     await flutterTts.speak(response);
   }
 
+double initialX = 0.0;
+
+  void _onHorizontalDragStart(DragStartDetails details) {
+    initialX = details.globalPosition.dx;
+  }
+
+  void _onHorizontalDragUpdate(DragUpdateDetails details) {
+    final currentX = details.globalPosition.dx;
+    final deltaX = currentX - initialX;
+
+    if (deltaX > 20) {
+      _selectPreviousPizza();
+      initialX = currentX;
+    } else if (deltaX < -20) {
+      _selectNextPizza();
+      initialX = currentX;
+    }
+  }
+
+void _selectNextPizza() {
+  setState(() {
+    selectedPizzaIndex = (selectedPizzaIndex + 1) % dataPizza.length;
+    isSmallSelected = false; 
+    isMediumSelected = false;
+  });
+}
+
+void _selectPreviousPizza() {
+  setState(() {
+    selectedPizzaIndex =
+        (selectedPizzaIndex - 1 + dataPizza.length) % dataPizza.length;
+    isSmallSelected = false; 
+    isMediumSelected = false;
+  });
+}
+
   String selectedSize = '';
   double plateSizeFactor = 1.0;
 
+  double getScaleFactor() {
+    if (isSmallSelected) {
+      return 0.85;
+    } else if (isMediumSelected) {
+      return 0.95;
+    } else {
+      return 1.0;
+    }
+  }
+double getPrice() {
+  if (isSmallSelected) {
+    return dataPizza[selectedPizzaIndex].price[0]; 
+  } else if (isMediumSelected) {
+    return dataPizza[selectedPizzaIndex].price[1]; 
+  } else {
+    return dataPizza[selectedPizzaIndex].price[2]; 
+  }
+}
+
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 650,
-      width: 600,
-      child: Stack(children: [
-        Container(
-          margin: EdgeInsets.only(top: 80, left: 75),
-          width: 230,
-          height: 500,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(115),
-            boxShadow: [
-              BoxShadow(
-                offset: Offset(45, 45.0),
-                blurRadius: 99,
-                spreadRadius: -50,
-                color: Color.fromRGBO(82, 42, 33, 0.3),
-              ),
-              BoxShadow(
-                offset: Offset(-45, -45.0),
-                blurRadius: 99,
-                spreadRadius: -50,
-                color: Color.fromRGBO(82, 42, 33, 0.3),
-              ),
-            ],
+Widget build(BuildContext context) {
+  PizzaModel selectedPizza = dataPizza[selectedPizzaIndex];
+  return Stack(
+    children: [
+      Column(
+        children: [
+          SizedBox(
+            height: 10,
           ),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PizzaOrderScreen()));
-            },
-            child: Stack(
+          Text(
+            '${selectedPizza.name}',
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.w600),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            '${selectedPizza.desc}',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+            ),
+          ),
+          SizedBox(
+            height: 50,
+          ),
+          Container(
+            width: 350,
+            height: 70,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.white,
+                width: 1.0,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Positioned(
-                  bottom: 220,
-                  left: 20,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'New Orleans Pizza',
-                        style: TextStyle(
-                            fontSize: 30,
-                            fontFamily: 'IntroHeadB',
-                            fontWeight: FontWeight.w500,
-                            color: Color.fromARGB(221, 85, 34, 3)),
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedSize = 'Small';
+                      isSmallSelected = true;
+                      isMediumSelected = false;
+                    });
+                  },
+                  child: Text(
+                    'SMALL',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: isSmallSelected ? Colors.red : Colors.white,
+                    ),
                   ),
                 ),
-                Positioned(
-                  bottom: 190,
-                  left: 65,
-                  child: Row(
-                    children: List.generate(
-                        5,
-                        (index) => Icon(
-                              Icons.star_border,
-                              size: 17,
-                            )),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedSize = 'Medium';
+                      isSmallSelected = false;
+                      isMediumSelected = true;
+                    });
+                  },
+                  child: Text(
+                    'MEDIUM',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: isMediumSelected ? Colors.red : Colors.white,
+                    ),
                   ),
                 ),
-                Positioned(
-                  bottom: 130,
-                  left: 55,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        '₹ 1000',
-                        style: TextStyle(
-                            fontSize: 40,
-                            fontFamily: 'RozhaOne',
-                            fontWeight: FontWeight.w500,
-                            color: Color.fromARGB(221, 47, 18, 0)),
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedSize = 'Large';
+                      isSmallSelected = false;
+                      isMediumSelected = false;
+                    });
+                  },
+                  child: Text(
+                    'LARGE',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: selectedSize == 'Large'
+                          ? Colors.red
+                          : Colors.white,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
-        Positioned(
-          left: 15,
-          top: -10,
+          SizedBox(
+            height: 100,
+          ),
+          GestureDetector(
+      onHorizontalDragStart: _onHorizontalDragStart,
+      onHorizontalDragUpdate: _onHorizontalDragUpdate,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 100),
+        width: 400,
+        height: 400,
+        child: Transform.scale(
+          scale: getScaleFactor(),
           child: Image.asset(
-            'assets/images/circle-salad.png',
-            width: 350,
+            'assets/images/${selectedPizza.image}',
+            fit: BoxFit.cover,
           ),
         ),
-        Positioned(
-          left: 55,
-          top: 15,
-          child: Transform.scale(
-            scale: plateSizeFactor,
-            child: Image.asset(
-              'assets/images/wooden_plate2.png',
-              width: 260,
-            ),
-          ),
-        ),
-        Positioned(
-          left: 63,
-          top: 28,
-          child: Transform.scale(
-            scale: plateSizeFactor,
-            child: Image.asset(
-              'assets/images/pizza2.png',
-              width: 235,
-            ),
-          ),
-        ),
-        Positioned(
-          left: -100,
-          top: 320,
-          child: Image.asset(
-            'assets/images/pizza1.png',
-            width: 150,
-          ),
-        ),
-        Positioned(
-          left: 330,
-          top: 320,
-          child: Image.asset(
-            'assets/images/pizza3.png',
-            width: 150,
-          ),
-        ),
-        Positioned(
-          bottom: 100,
-          left: 110,
-          child: ShadowTextSelector(
-            onSizeSelected: (size) {
-              setState(() {
-                if (size == 'S') {
-                  plateSizeFactor = 0.9;
-                } else if (size == 'M') {
-                  plateSizeFactor = 1.0;
-                } else if (size == 'L') {
-                  plateSizeFactor = 1.1;
-                }
-              });
-            },
-          ),
-        ),
-        Positioned(
-            top: 540,
-            left: 160,
-            child: Container(
-              height: 60,
-              width: 60,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.orange.withOpacity(0.5), Colors.orange])),
-              child: Icon(
-                Icons.shopping_cart_outlined,
-                color: Colors.white,
-                size: 35,
-              ),
-            )),
-        Positioned(
-          bottom: 20,
-          right: 20,
-          child: FloatingActionButton(
-            onPressed: () {
-              _initializeSpeechRecognition();
-            },
-            child: Icon(Icons.mic),
-          ),
-        ),
-      ]),
+      ),
+    ),
+          ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 6, 5, 4),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  fixedSize: Size(140, 25)),
+              onPressed: () {
+               Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PizzaOrderScreen(
+          
+        )
+      ),
     );
-  }
+              },
+              icon: Icon(Icons.shopping_cart, size: 14, color: Colors.white),
+              label: Text(
+                'Add to cart',
+                style: TextStyle(fontSize: 14, color: Colors.white),
+              )),
+        ],
+      ),
+      Positioned(
+        top: 200,
+        child: Image(
+          image: AssetImage('assets/images/stars.webp'),
+          height: 400,
+        ),
+      ),
+      Positioned(
+        right: 20,
+        top: 700,
+        child: FloatingActionButton(
+          shape: CircleBorder(),
+          onPressed: () {
+            _initializeSpeechRecognition();
+          },
+          child: Icon(Icons.mic),
+        ),
+      ),
+      Positioned(
+        bottom: 450,
+        left: 20,
+        child: Row(
+          children: [
+            FloatingActionButton(
+              backgroundColor: Color.fromARGB(66, 183, 180, 180),
+              shape: CircleBorder(),
+              onPressed: _selectPreviousPizza,
+              child: Icon(Icons.arrow_left, color: Colors.white, size: 38,),
+            ),
+            SizedBox(width: 80),
+            Text(
+              '₹${getPrice()}',
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
+            SizedBox(width: 80),
+            FloatingActionButton(
+              backgroundColor: Color.fromARGB(66, 183, 180, 180),
+              shape: CircleBorder(),
+              onPressed: _selectNextPizza,
+              child: Icon(Icons.arrow_right, color: Colors.white, size: 38,),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
 }
+}  
